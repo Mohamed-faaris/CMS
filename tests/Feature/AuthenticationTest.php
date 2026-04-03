@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -40,5 +41,15 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertGuest();
+    }
+
+    public function test_dashboard_redirects_learners_to_their_dashboard(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole(Role::findOrCreate('learner'));
+
+        $response = $this->actingAs($user)->get('/dashboard');
+
+        $response->assertRedirect(route('learner.dashboard'));
     }
 }
